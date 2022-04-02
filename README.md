@@ -228,3 +228,39 @@ Discards any data in the record/playback buffers.
 **get_latency()**
 
 Returns the record/playback latency reported by PulseAudio in microseconds.
+
+
+### PulseAudio error codes
+
+This list of PulseAudio internal error codes has been [taken from here](https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/blob/master/src/pulse/def.h#L471).
+
+| Error code | Description |
+| --- | --- |
+| 0 | No error |
+| 1 | Access failure |
+| 2 | Unknown command |
+| 3 | Invalid argument |
+| 4 | Entity exists |
+| 5 | No such entity |
+| 6 | Connection refused |
+| 7 | Protocol error |
+| 8 | Timeout |
+| 9 | No authentication key |
+| 10 | Internal error |
+| 11 | Connection terminated |
+| 12 | Entity killed |
+| 13 | Invalid server |
+| 14 | Module initialization failed |
+| 15 | Bad state |
+| 16 | No data |
+| 17 | Incompatible protocol version |
+| 18 | Data too large |
+| 19 | Operation not supported |
+| 20 | The error code was unknown to the client |
+| 21 | Extension does not exist |
+| 22 | Obsolete functionality |
+| 23 | Missing implementation |
+| 24 | The caller forked without calling execve() and tried to reuse the context |
+| 25 | An IO error happened |
+| 26 | Device or resource busy |
+| 27 | Not really an error but the first invalid error code |
