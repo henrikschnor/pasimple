@@ -11,7 +11,7 @@ def get_libpulse_simple():
         try:
             _libpulse_simple = ctypes.CDLL('libpulse-simple.so.0')
             _libpulse_simple.pa_simple_new.restype = ctypes.c_void_p
-            _libpulse_simple.pa_simple_get_latency = ctypes.c_ulonglong
+            _libpulse_simple.pa_simple_get_latency.restype = ctypes.c_uint64
         except OSError as err:
             raise PaSimpleError(f'{type(err)}: {err}')
     return _libpulse_simple
@@ -185,6 +185,6 @@ class PaSimple:
         
         error = ctypes.c_int(0)
         latency = get_libpulse_simple().pa_simple_get_latency(ctypes.c_void_p(self._stream), ctypes.byref(error))
-        if error != 0:
+        if error.value != 0:
             raise PaSimpleError(f'Could not get latency, error code: {error.value}')
-        return latency.value
+        return latency
