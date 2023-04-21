@@ -15,7 +15,7 @@ There's a good chance your Linux distribution comes with PulseAudio or PipeWire 
 
 ## Installation
 
-```
+```sh
 pip3 install pasimple
 ```
 
@@ -39,7 +39,7 @@ Both functions block until all audio has been recorded/played. The default encod
 
 ### Recording
 
-A more extensive example for recording audio can be found in [examples/record.py](examples/record.py):
+A more extensive example for recording audio can be found in [examples/record.py](https://github.com/henrikschnor/pasimple/blob/master/examples/record.py):
 
 ```python
 import wave
@@ -72,7 +72,7 @@ Finally, the data is written to a `.wav` file. We specify the audio format again
 
 ### Playing
 
-An example for playing audio can be found in [examples/play.py](examples/play.py):
+An example for playing audio can be found in [examples/play.py](https://github.com/henrikschnor/pasimple/blob/master/examples/play.py):
 
 ```python
 import wave
@@ -92,6 +92,11 @@ with pasimple.PaSimple(pasimple.PA_STREAM_PLAYBACK, format, channels, sample_rat
 ```
 
 To play a `.wav` file, we basically do the recording steps in reverse. First, we read the audio encoding together with the raw audio data from the file. When creating the `PaSimple` object, this time, we're opening a playback stream and specify the format of the audio we're going to play. It's then as simple as passing the raw audio data to the `write` function. Finally, we call `drain` to make sure all audio has played before closing the stream by leaving the `with` context.
+
+
+### Streaming
+
+An annotated example of how to stream audio from/to a source/sink can be found in [examples/echo.py](https://github.com/henrikschnor/pasimple/blob/master/examples/echo.py)
 
 
 ## Documentation
@@ -165,15 +170,20 @@ Records a `.wav` file via PulseAudio and blocks until all audio data has been re
 
 An instance of `PaSimple` represents an audio stream for playing or recording audio via PulseAudio. On error, all functions throw a `PaSimpleError`.
 
-**PaSimple**(`direction`, `format`, `channels`, `rate`, `app_name='python'`, `stream_name=None`, `server_name=None`, `device_name=None`):
+**PaSimple**(`direction`, `format`, `channels`, `rate`, `app_name='python'`, `stream_name=None`, `server_name=None`, `device_name=None`, `maxlength=-1`, `tlength=-1`, `prebuf=-1`, `minreq=-1`, `fragsize=-1`):
 - `direction`: Either `PA_STREAM_PLAYBACK` or `PA_STREAM_RECORD`.
 - `format`: The audio encoding (one of `PA_SAMPLE_*`) for this stream.
 - `channels`: Integer specifying the number of channels (1=mono, 2=stereo).
 - `rate`: Integer specifying the sample rate in Hz.
 - `app_name`: String specifying the name of the application that will be registered in PulseAudio.
 - `stream_name`: `None` (use `app_name`) or a string specifying the name of this stream that will be registered in PulseAudio.
-- `server_name`: `None` (use default) or a string specifying a PulseAudio server name.
-- `device_name`: `None` (use default) or a string specifying a specific PulseAudio device for recording or playback.
+- `server_name`: `None` (default) or a string specifying a PulseAudio server name.
+- `device_name`: `None` (default) or a string specifying a specific PulseAudio device for recording or playback.
+- `maxlength`: `-1` (default: max supported) or an integer specifying the buffer size limit in bytes.
+- `tlength`: `-1` (default: about 2s) or an integer specifying how many bytes to keep in the playback buffer.
+- `prebuf`: `-1` (use `tlength`) or an integer specifying how many bytes to buffer before starting playback.
+- `minreq`: `-1` (default: about 2s) or an integer specifying the minimum size of chunks for refilling the playback buffer in bytes.
+- `fragsize`: `-1` (default: about 2s) or an integer specifying the size of recording chunks in bytes.
 
 Initialize a PulseAudio simple API stream for playing or recording audio data.
 
