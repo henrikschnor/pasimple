@@ -2,5 +2,5 @@ __pycache__/
 *.egg-info/
 dist/
 
-/examples/recording.wav
+*.wav
 /_experiments/
