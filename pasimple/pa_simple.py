@@ -27,8 +27,22 @@ class pa_sample_spec(ctypes.Structure):
     ]
 
 
+class pa_buffer_attr(ctypes.Structure):
+    """Struct describing playback and record buffer metrics"""
+
+    _fields_ = [
+        ('maxlength', ctypes.c_uint32),
+        ('tlength', ctypes.c_uint32),
+        ('prebuf', ctypes.c_uint32),
+        ('minreq', ctypes.c_uint32),
+        ('fragsize', ctypes.c_uint32),
+    ]
+
+
 class PaSimple:
-    def __init__(self, direction, format, channels, rate, app_name='python', stream_name=None, server_name=None, device_name=None):
+    def __init__(self, direction, format, channels, rate, app_name='python',
+                 stream_name=None, server_name=None, device_name=None,
+                 maxlength=-1, tlength=-1, prebuf=-1, minreq=-1, fragsize=-1):
         """Initialize a pulseaudio simple API stream.
 
         direction: either PA_STREAM_PLAYBACK or PA_STREAM_RECORD
@@ -39,6 +53,13 @@ class PaSimple:
         stream_name: None (use app_name) or string specifying a name for this stream
         server_name: None (use default) or string specifying a pulseaudio server name
         device_name: None (use default) or string specifying a pulseaudio device
+
+        Buffer-related options are in units of bytes:
+        maxlength: integer buffer size limit, or -1 (default: max supported)
+        tlength: keep this many bytes in playback buffer, or -1 (default: about 2s)
+        prebuf: buffer this many bytes before starting playback, or -1 (default: ==tlength)
+        minreq: refill playback buffer in chunks at least this big, or -1 (default: about 2s)
+        fragsize: receive recorded audio in chunks of this size, or -1 (default: about 2s)
         """
 
         # Save audio encoding properties
@@ -53,6 +74,7 @@ class PaSimple:
 
         # Prepare arguments for initializing a pulseaudio stream
         sample_spec = pa_sample_spec(format, rate, channels)
+        buffer_attr = pa_buffer_attr(maxlength, tlength, prebuf, minreq, fragsize)
         arg_server_name = ctypes.c_char_p(server_name.encode()) if server_name is not None else None
         arg_app_name = ctypes.c_char_p(app_name.encode())
         arg_device_name = ctypes.c_char_p(device_name.encode()) if device_name is not None else None
@@ -62,7 +84,7 @@ class PaSimple:
         # Initialize the stream.
         # Keep track of the underlying stream's state to avoid double frees
         self._stream_alive = False
-        self._stream = get_libpulse_simple().pa_simple_new(arg_server_name, arg_app_name, direction, arg_device_name, arg_stream_name, ctypes.byref(sample_spec), None, None, ctypes.byref(error))
+        self._stream = get_libpulse_simple().pa_simple_new(arg_server_name, arg_app_name, direction, arg_device_name, arg_stream_name, ctypes.byref(sample_spec), None, ctypes.byref(buffer_attr), ctypes.byref(error))
         if self._stream is None:
             raise PaSimpleError(f'Error while creating stream: {error.value}')
         self._stream_alive = True
