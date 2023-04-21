@@ -152,7 +152,7 @@ class PaSimple:
         ok = get_libpulse_simple().pa_simple_read(ctypes.c_void_p(self._stream), rec_buffer_ptr.from_buffer(rec_buffer), num_bytes, ctypes.byref(error))
         if ok != 0:
             raise PaSimpleError(f'Could not record audio, error code: {error.value}')
-        return rec_buffer
+        return bytes(rec_buffer)
 
 
     def write(self, data):
