@@ -71,10 +71,10 @@ def play_wav(file_path):
     """
 
     with wave.open(file_path, 'rb') as wf:
-        with pasimple.PaSimple(pasimple.PA_STREAM_PLAYBACK,
-                               width2format(wf.getsampwidth()),
-                               wf.getnchannels(),
-                               wf.getframerate()) as pa:
+        with PaSimple(PA_STREAM_PLAYBACK,
+                      width2format(wf.getsampwidth()),
+                      wf.getnchannels(),
+                      wf.getframerate()) as pa:
             pa.write(wf.readframes(wf.getnframes()))
             pa.drain()
 
@@ -87,10 +87,10 @@ def record_wav(file_path, length, format=PA_SAMPLE_S24LE, channels=1, sample_rat
     PA_SAMPLE_U8, PA_SAMPLE_S16LE, PA_SAMPLE_S24LE, PA_SAMPLE_S32LE
     """
 
-    with pasimple.PaSimple(pasimple.PA_STREAM_RECORD, format, channels, sample_rate) as pa:
+    with PaSimple(PA_STREAM_RECORD, format, channels, sample_rate) as pa:
         audio_data = pa.read(channels * sample_rate * format2width(format) * length)
     with wave.open(file_path, 'wb') as wf:
-        wf.setsampwidth(sample_width)
+        wf.setsampwidth(format2width(format))
         wf.setnchannels(channels)
         wf.setframerate(sample_rate)
         wf.writeframes(audio_data)
